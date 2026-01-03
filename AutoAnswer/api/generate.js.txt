@@ -1,0 +1,33 @@
+import OpenAI from "openai";
+
+export default async function handler(req, res) {
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { messages, mode } = req.body;
+  if (!messages) return res.status(400).json({ error: "messages_required" });
+
+  function modePrompt(mode) {
+    switch(mode) {
+      case "confident": return "Отвечай уверенно, спокойно, без высокомерия.";
+      case "warm": return "Отвечай тепло, мягко, но по-человечески.";
+      default: return "Отвечай естественно, живо, без банальщины и официоза.";
+    }
+  }
+
+  try {
+    const systemContent = modePrompt(mode);
+    const completion = await client.chat.completions.create({
+      model: "gpt-5-mini",
+      messages: [{ role: "system", content: systemContent }, ...messages]
+    });
+
+    const reply = completion.choices[0].message.content;
+    res.status(200).json({ reply });
+  } catch (e) {
+    res.status(500).json({ error: "ai_error", detail: e.message });
+  }
+}

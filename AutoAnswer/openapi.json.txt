@@ -1,0 +1,30 @@
+{
+  "openapi": "3.0.1",
+  "info": { "title": "AutoAnswer API", "version": "1.0.0" },
+  "paths": {
+    "/generate": {
+      "post": {
+        "summary": "Создает естественный ответ",
+        "operationId": "generate_reply",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "messages": {
+                    "type": "array",
+                    "items": { "type": "object", "properties": { "role": { "type": "string" }, "content": { "type": "string" } } }
+                  },
+                  "mode": { "type": "string", "description": "Стиль ответа: calm, confident, warm" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  }
+}
